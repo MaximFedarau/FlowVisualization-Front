@@ -86,14 +86,20 @@ export const graphSlice = createSlice({
           (a: number, b: number) => a < b
         );
         state.nodes[newSinkIndex].is_sink = true;
+        state.edges = state.edges.filter(
+          (edge) => edge.from_id !== state.nodes[newSinkIndex].id
+        );
       }
 
       if (removedNode.is_source) {
-        const newSinkIndex = findNodeIndex(
+        const newSourceIndex = findNodeIndex(
           state.nodes,
           (a: number, b: number) => a > b
         );
-        state.nodes[newSinkIndex].is_source = true;
+        state.nodes[newSourceIndex].is_source = true;
+        state.edges = state.edges.filter(
+          (edge) => edge.to_id !== state.nodes[newSourceIndex].id
+        );
       }
     },
     updateNodePosition: (
