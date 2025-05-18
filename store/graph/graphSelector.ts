@@ -8,3 +8,8 @@ export const graphModeSelector = createSelector(
   [graphReducerSelector],
   ({ mode }) => mode
 );
+
+export const graphNodesSelector = createSelector(
+  [graphReducerSelector],
+  ({ nodes }) => nodes
+);

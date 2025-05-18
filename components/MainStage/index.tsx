@@ -7,17 +7,15 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { KonvaNode, MODES } from "@/types";
+import { MODES } from "@/types";
 import { Stage } from "react-konva";
 import { Grid } from "@/components/Grid";
 import { KonvaEventObject } from "konva/lib/Node";
 import { MainScene } from "../MainScene";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { graphModeSelector, setMode } from "@/store/graph";
+import { addNode, graphModeSelector, setMode } from "@/store/graph";
 
 export const MainStage: FC = () => {
-  const [nodes, setNodes] = useState<KonvaNode[]>([]);
-
   const stageWidth = useMemo(() => (global.window ? window.innerWidth : 0), []);
   const stageHeight = useMemo(
     () => (global.window ? window.innerHeight : 0),
@@ -62,13 +60,12 @@ export const MainStage: FC = () => {
 
   const handleClick = ({ evt }: KonvaEventObject<MouseEvent>) => {
     if (graphMode === MODES.NODE) {
-      setNodes([
-        ...nodes,
-        {
+      dispatch(
+        addNode({
           x: evt.clientX / stageSize.scale,
           y: evt.clientY / stageSize.scale,
-        },
-      ]);
+        })
+      );
     }
 
     if (graphMode === MODES.EDGE) {
@@ -85,7 +82,7 @@ export const MainStage: FC = () => {
         onClick={handleClick}
       >
         <Grid />
-        <MainScene nodes={nodes} {...stageSize} />
+        <MainScene {...stageSize} />
       </Stage>
     </div>
   );
