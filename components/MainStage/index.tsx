@@ -7,11 +7,13 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { KonvaNode } from "@/types";
+import { KonvaNode, MODES } from "@/types";
 import { Stage } from "react-konva";
 import { Grid } from "@/components/Grid";
 import { KonvaEventObject } from "konva/lib/Node";
 import { MainScene } from "../MainScene";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { graphModeSelector, setMode } from "@/store/graph";
 
 export const MainStage: FC = () => {
   const [nodes, setNodes] = useState<KonvaNode[]>([]);
@@ -55,14 +57,24 @@ export const MainStage: FC = () => {
     return () => window.removeEventListener("resize", updateLayoutOnResize);
   }, [updateLayoutOnResize]);
 
-  const addNodeOnClick = ({ evt }: KonvaEventObject<MouseEvent>) => {
-    setNodes([
-      ...nodes,
-      {
-        x: evt.clientX / stageSize.scale,
-        y: evt.clientY / stageSize.scale,
-      },
-    ]);
+  const graphMode = useAppSelector(graphModeSelector);
+  const dispatch = useAppDispatch();
+
+  const handleClick = ({ evt }: KonvaEventObject<MouseEvent>) => {
+    if (graphMode === MODES.NODE) {
+      setNodes([
+        ...nodes,
+        {
+          x: evt.clientX / stageSize.scale,
+          y: evt.clientY / stageSize.scale,
+        },
+      ]);
+    }
+
+    if (graphMode === MODES.EDGE) {
+      dispatch(setMode(MODES.DEFAULT));
+      console.log(2);
+    }
   };
 
   return (
@@ -70,7 +82,7 @@ export const MainStage: FC = () => {
       <Stage
         width={globalSizes.width}
         height={globalSizes.height}
-        onMouseDown={addNodeOnClick}
+        onClick={handleClick}
       >
         <Grid />
         <MainScene nodes={nodes} {...stageSize} />
