@@ -6,15 +6,28 @@ import {
   Ref,
   useCallback,
   useMemo,
+  KeyboardEvent,
+  ChangeEvent,
 } from "react";
-import { KonvaNode } from "@/types";
+import { MODES } from "@/types";
 import { Stage } from "react-konva";
 import { Grid } from "@/components/Grid";
 import { KonvaEventObject } from "konva/lib/Node";
 import { MainScene } from "../MainScene";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import {
+  addEdge,
+  addNode,
+  clearNewEdgeNodes,
+  graphModeSelector,
+  newEdgeNodesSelector,
+  setMode,
+} from "@/store/graph";
+import { createPortal } from "react-dom";
+import { Dialog } from "@/components/Dialog";
 
 export const MainStage: FC = () => {
-  const [nodes, setNodes] = useState<KonvaNode[]>([]);
+  const [isOpenDialog, setIsOpenDialog] = useState(false);
 
   const stageWidth = useMemo(() => (global.window ? window.innerWidth : 0), []);
   const stageHeight = useMemo(
@@ -55,14 +68,59 @@ export const MainStage: FC = () => {
     return () => window.removeEventListener("resize", updateLayoutOnResize);
   }, [updateLayoutOnResize]);
 
-  const addNodeOnClick = ({ evt }: KonvaEventObject<MouseEvent>) => {
-    setNodes([
-      ...nodes,
-      {
-        x: evt.clientX / stageSize.scale,
-        y: evt.clientY / stageSize.scale,
-      },
-    ]);
+  const graphMode = useAppSelector(graphModeSelector);
+  const dispatch = useAppDispatch();
+
+  const handleClick = ({ evt }: KonvaEventObject<MouseEvent>) => {
+    if (graphMode === MODES.NODE) {
+      dispatch(
+        addNode({
+          x: evt.clientX / stageSize.scale,
+          y: evt.clientY / stageSize.scale,
+        })
+      );
+    }
+
+    if (graphMode === MODES.EDGE) {
+      dispatch(clearNewEdgeNodes());
+      dispatch(setMode(MODES.DEFAULT));
+    }
+  };
+
+  const [capacityValue, setCapacityValue] = useState<string>("");
+
+  const openDialog = () => setIsOpenDialog(true);
+  const closeDialog = () => {
+    setIsOpenDialog(false);
+    setCapacityValue("");
+    dispatch(clearNewEdgeNodes());
+  };
+
+  const validateCapacityInput = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key.length === 1 && !/[0-9]/.test(event.key)) {
+      event.preventDefault();
+    }
+  };
+
+  const updateCapacityInputValue = (event: ChangeEvent<HTMLInputElement>) => {
+    setCapacityValue(event.target.value);
+  };
+
+  const newEdgeNodes = useAppSelector(newEdgeNodesSelector);
+
+  const createNewEdge = () => {
+    if (isNaN(parseInt(capacityValue))) {
+      closeDialog();
+      return;
+    }
+    dispatch(
+      addEdge({
+        from_id: newEdgeNodes[0],
+        to_id: newEdgeNodes[1],
+        capacity: parseInt(capacityValue),
+      })
+    );
+    closeDialog();
   };
 
   return (
@@ -70,11 +128,29 @@ export const MainStage: FC = () => {
       <Stage
         width={globalSizes.width}
         height={globalSizes.height}
-        onMouseDown={addNodeOnClick}
+        onClick={handleClick}
       >
         <Grid />
-        <MainScene nodes={nodes} {...stageSize} />
+        <MainScene openNewEdgeDialog={openDialog} {...stageSize} />
       </Stage>
+      {isOpenDialog &&
+        createPortal(
+          <Dialog
+            title="Create new edge?"
+            onClose={closeDialog}
+            onAgree={createNewEdge}
+            onDisagree={closeDialog}
+          >
+            <input
+              className="border-1 h-10 px-2 rounded-lg"
+              placeholder="Select capacity"
+              onKeyDown={validateCapacityInput}
+              value={capacityValue}
+              onChange={updateCapacityInputValue}
+            />
+          </Dialog>,
+          document.getElementById("modal-root")!
+        )}
     </div>
   );
 };
