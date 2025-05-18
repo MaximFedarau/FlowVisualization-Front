@@ -1,6 +1,6 @@
 import { KonvaNode } from "@/types";
 import { FC } from "react";
-import { Layer, Circle } from "react-konva";
+import { Circle } from "react-konva";
 
 interface Props {
   nodes: KonvaNode[];
@@ -8,10 +8,18 @@ interface Props {
 
 export const NodesScene: FC<Props> = ({ nodes }) => {
   return (
-    <Layer>
+    <>
       {nodes.map((node, index) => (
-        <Circle key={index} x={node.x} y={node.y} radius={16} fill="red" />
+        <Circle
+          key={index}
+          x={node.x}
+          y={node.y}
+          radius={20}
+          fill="white"
+          stroke="black"
+          strokeWidth={0.3}
+        />
       ))}
-    </Layer>
+    </>
   );
 };

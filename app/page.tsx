@@ -1,14 +1,10 @@
 "use client";
 import { NextPage } from "next";
 
-import { Scene } from "@/components/Scene";
+import { MainStage } from "@/components/MainStage";
 
 const Home: NextPage = () => {
-  return (
-    <>
-      <Scene />
-    </>
-  );
+  return <MainStage />;
 };
 
 export default Home;
