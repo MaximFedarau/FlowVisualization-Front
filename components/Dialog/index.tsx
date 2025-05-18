@@ -30,14 +30,14 @@ export const Dialog: FC<Props> = ({
         </header>
         <div className="flex gap-4">
           <button
-            className="h-14 w-24 rounded-lg p-5 text-sm font-medium text-center border-none cursor-pointer bg-green-300 hover:opacity-90"
+            className="h-14 w-24 rounded-lg px-5 text-sm font-medium text-center border-none cursor-pointer bg-green-300 hover:opacity-90"
             onClick={onAgree}
           >
             Confirm
           </button>
           <button
             onClick={onDisagree}
-            className="h-14 w-24 rounded-lg p-5 text-sm font-medium text-center border-none cursor-pointer bg-red-300 hover:opacity-90"
+            className="h-14 w-24 rounded-lg px-5 text-sm font-medium text-center border-none cursor-pointer bg-red-300 hover:opacity-90"
           >
             Cancel
           </button>

@@ -6,6 +6,8 @@ import {
   Ref,
   useCallback,
   useMemo,
+  KeyboardEvent,
+  ChangeEvent,
 } from "react";
 import { MODES } from "@/types";
 import { Stage } from "react-konva";
@@ -13,14 +15,16 @@ import { Grid } from "@/components/Grid";
 import { KonvaEventObject } from "konva/lib/Node";
 import { MainScene } from "../MainScene";
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { addNode, graphModeSelector, setMode } from "@/store/graph";
+import {
+  addNode,
+  clearNewEdgeNodes,
+  graphModeSelector,
+  setMode,
+} from "@/store/graph";
 import { createPortal } from "react-dom";
 import { Dialog } from "@/components/Dialog";
 
 export const MainStage: FC = () => {
-  const [newEdgeSelectedNodes, setNewEdgeSelectedNodes] = useState<number[]>(
-    []
-  );
   const [isOpenDialog, setIsOpenDialog] = useState(false);
 
   const stageWidth = useMemo(() => (global.window ? window.innerWidth : 0), []);
@@ -76,7 +80,7 @@ export const MainStage: FC = () => {
     }
 
     if (graphMode === MODES.EDGE) {
-      setNewEdgeSelectedNodes([]);
+      dispatch(clearNewEdgeNodes());
       dispatch(setMode(MODES.DEFAULT));
     }
   };
@@ -84,7 +88,19 @@ export const MainStage: FC = () => {
   const openDialog = () => setIsOpenDialog(true);
   const closeDialog = () => {
     setIsOpenDialog(false);
-    setNewEdgeSelectedNodes([]);
+    dispatch(clearNewEdgeNodes());
+  };
+
+  const [capacityValue, setCapacityValue] = useState<string>("");
+
+  const validateCapacityInput = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key.length === 1 && !/[0-9]/.test(event.key)) {
+      event.preventDefault();
+    }
+  };
+
+  const updateCapacityInputValue = (event: ChangeEvent<HTMLInputElement>) => {
+    setCapacityValue(event.target.value);
   };
 
   return (
@@ -95,12 +111,7 @@ export const MainStage: FC = () => {
         onClick={handleClick}
       >
         <Grid />
-        <MainScene
-          newEdgeSelectedNodesIds={newEdgeSelectedNodes}
-          selectNewEdgeNodes={setNewEdgeSelectedNodes}
-          openNewEdgeDialog={openDialog}
-          {...stageSize}
-        />
+        <MainScene openNewEdgeDialog={openDialog} {...stageSize} />
       </Stage>
       {isOpenDialog &&
         createPortal(
@@ -110,7 +121,13 @@ export const MainStage: FC = () => {
             onAgree={() => console.log(2)}
             onDisagree={closeDialog}
           >
-            <p>Select settings</p>
+            <input
+              className="border-1 h-10 px-2 rounded-lg"
+              placeholder="Select capacity"
+              onKeyDown={validateCapacityInput}
+              value={capacityValue}
+              onChange={updateCapacityInputValue}
+            />
           </Dialog>,
           document.getElementById("modal-root")!
         )}

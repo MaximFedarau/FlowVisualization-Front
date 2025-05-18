@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from "@/hooks";
-import { graphModeSelector, setMode } from "@/store/graph";
+import { clearNewEdgeNodes, graphModeSelector, setMode } from "@/store/graph";
 import { MODES } from "@/types";
 import { FC, ReactNode, Key } from "react";
 
@@ -16,6 +16,7 @@ export const ToolbarButton: FC<Props> = ({ children, mode }) => {
   const dispatch = useAppDispatch();
 
   const handleClick = () => {
+    dispatch(clearNewEdgeNodes());
     dispatch(setMode(mode || MODES.DEFAULT));
   };
 

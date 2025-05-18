@@ -4,8 +4,10 @@ import { MODES } from "@/types";
 import { Circle, Text } from "react-konva";
 import { useAppSelector } from "@/hooks";
 import {
+  addNewEdgeNode,
   graphModeSelector,
   graphNodesSelector,
+  newEdgeNodesSelector,
   removeNode,
 } from "@/store/graph";
 import { KonvaEventObject } from "konva/lib/Node";
@@ -15,8 +17,6 @@ interface Props {
   width: number;
   height: number;
   scale: number;
-  selectNewEdgeNodes: (ids: number[]) => void;
-  newEdgeSelectedNodesIds: number[];
   openNewEdgeDialog: () => void;
 }
 
@@ -24,12 +24,11 @@ export const MainScene: FC<Props> = ({
   width,
   height,
   scale,
-  newEdgeSelectedNodesIds,
-  selectNewEdgeNodes,
   openNewEdgeDialog,
 }) => {
   const graphMode = useAppSelector(graphModeSelector);
   const graphNodes = useAppSelector(graphNodesSelector);
+  const newEdgeNodes = useAppSelector(newEdgeNodesSelector);
   const dispatch = useDispatch();
 
   const handleClick = (event: KonvaEventObject<MouseEvent>, id: number) => {
@@ -42,24 +41,16 @@ export const MainScene: FC<Props> = ({
     if (graphMode === MODES.EDGE) {
       const selectedNode = graphNodes.find((node) => node.id === id);
 
-      if (
-        selectedNode &&
-        selectedNode.is_sink &&
-        newEdgeSelectedNodesIds.length === 0
-      ) {
+      if (selectedNode && selectedNode.is_sink && newEdgeNodes.length === 0) {
         return;
       }
 
-      if (
-        selectedNode &&
-        selectedNode.is_source &&
-        newEdgeSelectedNodesIds.length === 1
-      ) {
+      if (selectedNode && selectedNode.is_source && newEdgeNodes.length === 1) {
         return;
       }
 
-      selectNewEdgeNodes([...newEdgeSelectedNodesIds, id]);
-      if (newEdgeSelectedNodesIds.length == 1) {
+      dispatch(addNewEdgeNode(id));
+      if (newEdgeNodes.length == 1) {
         openNewEdgeDialog();
         return;
       }
@@ -81,7 +72,7 @@ export const MainScene: FC<Props> = ({
               draggable={graphMode === MODES.DEFAULT}
               onClick={(event) => handleClick(event, node.id)}
             />
-            {newEdgeSelectedNodesIds.indexOf(node.id) != -1 && (
+            {newEdgeNodes.indexOf(node.id) != -1 && (
               <Text
                 x={node.x - 10}
                 y={node.y - 10}
@@ -89,7 +80,7 @@ export const MainScene: FC<Props> = ({
                 height={20}
                 align="center"
                 verticalAlign="middle"
-                text={`${newEdgeSelectedNodesIds.indexOf(node.id) + 1}`}
+                text={`${newEdgeNodes.indexOf(node.id) + 1}`}
               />
             )}
           </Group>

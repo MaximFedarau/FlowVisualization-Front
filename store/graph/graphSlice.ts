@@ -5,12 +5,14 @@ import { GraphNode, MODES, KonvaNode } from "@/types";
 interface InitialState {
   mode: MODES;
   nodes: GraphNode[];
+  newEdgeNodes: number[];
   idCounter: number;
 }
 
 const initialState: InitialState = {
   mode: MODES.DEFAULT,
   nodes: [],
+  newEdgeNodes: [],
   idCounter: 0,
 };
 
@@ -85,7 +87,19 @@ export const graphSlice = createSlice({
         state.nodes[newSinkIndex].is_source = true;
       }
     },
+    addNewEdgeNode: (state, { payload }: PayloadAction<number>) => {
+      state.newEdgeNodes.push(payload);
+    },
+    clearNewEdgeNodes: (state) => {
+      state.newEdgeNodes = [];
+    },
   },
 });
 
-export const { setMode, addNode, removeNode } = graphSlice.actions;
+export const {
+  setMode,
+  addNode,
+  removeNode,
+  addNewEdgeNode,
+  clearNewEdgeNodes,
+} = graphSlice.actions;
