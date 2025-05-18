@@ -45,7 +45,7 @@ export const graphSlice = createSlice({
 
       state.idCounter += 1;
 
-      if (state.nodes.length > 1) {
+      if (state.nodes.length >= 1) {
         const prevSinkIndex = findNodeIndex(
           state.nodes,
           (a: number, b: number) => a < b

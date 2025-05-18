@@ -11,7 +11,6 @@ const recalculateGridPoints = (globalWidth: number, globalHeight: number) => {
     points.push([gridWidth * i, 0, gridWidth * i, globalHeight]);
     points.push([0, gridHeight * i, globalWidth, gridHeight * i]);
   }
-  console.log(points);
   return points;
 };
 

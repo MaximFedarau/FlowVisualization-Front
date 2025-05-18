@@ -14,8 +14,15 @@ import { KonvaEventObject } from "konva/lib/Node";
 import { MainScene } from "../MainScene";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import { addNode, graphModeSelector, setMode } from "@/store/graph";
+import { createPortal } from "react-dom";
+import { Dialog } from "@/components/Dialog";
 
 export const MainStage: FC = () => {
+  const [newEdgeSelectedNodes, setNewEdgeSelectedNodes] = useState<number[]>(
+    []
+  );
+  const [isOpenDialog, setIsOpenDialog] = useState(false);
+
   const stageWidth = useMemo(() => (global.window ? window.innerWidth : 0), []);
   const stageHeight = useMemo(
     () => (global.window ? window.innerHeight : 0),
@@ -69,9 +76,15 @@ export const MainStage: FC = () => {
     }
 
     if (graphMode === MODES.EDGE) {
+      setNewEdgeSelectedNodes([]);
       dispatch(setMode(MODES.DEFAULT));
-      console.log(2);
     }
+  };
+
+  const openDialog = () => setIsOpenDialog(true);
+  const closeDialog = () => {
+    setIsOpenDialog(false);
+    setNewEdgeSelectedNodes([]);
   };
 
   return (
@@ -82,8 +95,25 @@ export const MainStage: FC = () => {
         onClick={handleClick}
       >
         <Grid />
-        <MainScene {...stageSize} />
+        <MainScene
+          newEdgeSelectedNodesIds={newEdgeSelectedNodes}
+          selectNewEdgeNodes={setNewEdgeSelectedNodes}
+          openNewEdgeDialog={openDialog}
+          {...stageSize}
+        />
       </Stage>
+      {isOpenDialog &&
+        createPortal(
+          <Dialog
+            title="Create new edge?"
+            onClose={closeDialog}
+            onAgree={() => console.log(2)}
+            onDisagree={closeDialog}
+          >
+            <p>Select settings</p>
+          </Dialog>,
+          document.getElementById("modal-root")!
+        )}
     </div>
   );
 };
