@@ -1,14 +1,16 @@
 import { FC } from "react";
-import { Group, Layer } from "react-konva";
+import { Arrow, Group, Layer } from "react-konva";
 import { MODES } from "@/types";
 import { Circle, Text } from "react-konva";
 import { useAppSelector } from "@/hooks";
 import {
   addNewEdgeNode,
+  graphEdgesSelector,
   graphModeSelector,
   graphNodesSelector,
   newEdgeNodesSelector,
   removeNode,
+  updateNodePosition,
 } from "@/store/graph";
 import { KonvaEventObject } from "konva/lib/Node";
 import { useDispatch } from "react-redux";
@@ -28,6 +30,7 @@ export const MainScene: FC<Props> = ({
 }) => {
   const graphMode = useAppSelector(graphModeSelector);
   const graphNodes = useAppSelector(graphNodesSelector);
+  const graphEdges = useAppSelector(graphEdgesSelector);
   const newEdgeNodes = useAppSelector(newEdgeNodesSelector);
   const dispatch = useDispatch();
 
@@ -57,6 +60,10 @@ export const MainScene: FC<Props> = ({
     }
   };
 
+  const handleNodeDrag = (x: number, y: number, id: number) => {
+    dispatch(updateNodePosition({ x, y, id }));
+  };
+
   return (
     <>
       <Layer width={width} height={height} scaleX={scale} scaleY={scale}>
@@ -71,11 +78,14 @@ export const MainScene: FC<Props> = ({
               strokeWidth={0.3}
               draggable={graphMode === MODES.DEFAULT}
               onClick={(event) => handleClick(event, node.id)}
+              onDragMove={(event) =>
+                handleNodeDrag(event.target.x(), event.target.y(), node.id)
+              }
             />
             {newEdgeNodes.indexOf(node.id) != -1 && (
               <Text
-                x={node.x - 10}
-                y={node.y - 10}
+                x={node.actualX - 10}
+                y={node.actualY - 10}
                 width={20}
                 height={20}
                 align="center"
@@ -85,6 +95,35 @@ export const MainScene: FC<Props> = ({
             )}
           </Group>
         ))}
+        {graphEdges.map((edge) => {
+          const startNode = graphNodes.find(
+            (node) => node.id === edge.from_id
+          )!;
+          const endNode = graphNodes.find((node) => node.id === edge.to_id)!;
+          return (
+            <Group key={edge.id}>
+              <Arrow
+                key={edge.id}
+                points={[
+                  startNode.actualX,
+                  startNode.actualY,
+                  endNode.actualX,
+                  endNode.actualY,
+                ]}
+                fill="black"
+                stroke="black"
+                strokeWidth={0.5}
+              />
+              <Text
+                x={(startNode.actualX + endNode.actualX) / 2}
+                y={(startNode.actualY + endNode.actualY) / 2}
+                fontSize={16}
+                fontStyle="bold"
+                text={`${edge.capacity}`}
+              />
+            </Group>
+          );
+        })}
       </Layer>
     </>
   );

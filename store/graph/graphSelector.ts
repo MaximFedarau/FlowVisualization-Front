@@ -14,6 +14,11 @@ export const graphNodesSelector = createSelector(
   ({ nodes }) => nodes
 );
 
+export const graphEdgesSelector = createSelector(
+  [graphReducerSelector],
+  ({ edges }) => edges
+);
+
 export const newEdgeNodesSelector = createSelector(
   [graphReducerSelector],
   ({ newEdgeNodes }) => newEdgeNodes

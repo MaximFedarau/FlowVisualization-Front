@@ -16,9 +16,11 @@ import { KonvaEventObject } from "konva/lib/Node";
 import { MainScene } from "../MainScene";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import {
+  addEdge,
   addNode,
   clearNewEdgeNodes,
   graphModeSelector,
+  newEdgeNodesSelector,
   setMode,
 } from "@/store/graph";
 import { createPortal } from "react-dom";
@@ -85,13 +87,14 @@ export const MainStage: FC = () => {
     }
   };
 
+  const [capacityValue, setCapacityValue] = useState<string>("");
+
   const openDialog = () => setIsOpenDialog(true);
   const closeDialog = () => {
     setIsOpenDialog(false);
+    setCapacityValue("");
     dispatch(clearNewEdgeNodes());
   };
-
-  const [capacityValue, setCapacityValue] = useState<string>("");
 
   const validateCapacityInput = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key.length === 1 && !/[0-9]/.test(event.key)) {
@@ -101,6 +104,23 @@ export const MainStage: FC = () => {
 
   const updateCapacityInputValue = (event: ChangeEvent<HTMLInputElement>) => {
     setCapacityValue(event.target.value);
+  };
+
+  const newEdgeNodes = useAppSelector(newEdgeNodesSelector);
+
+  const createNewEdge = () => {
+    if (isNaN(parseInt(capacityValue))) {
+      closeDialog();
+      return;
+    }
+    dispatch(
+      addEdge({
+        from_id: newEdgeNodes[0],
+        to_id: newEdgeNodes[1],
+        capacity: parseInt(capacityValue),
+      })
+    );
+    closeDialog();
   };
 
   return (
@@ -118,7 +138,7 @@ export const MainStage: FC = () => {
           <Dialog
             title="Create new edge?"
             onClose={closeDialog}
-            onAgree={() => console.log(2)}
+            onAgree={createNewEdge}
             onDisagree={closeDialog}
           >
             <input
