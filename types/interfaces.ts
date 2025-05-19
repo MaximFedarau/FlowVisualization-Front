@@ -19,3 +19,20 @@ export interface GraphEdge {
   capacity: number;
   id: number;
 }
+
+export interface VisualizationEdge {
+  from_: number;
+  to: number;
+  flow: number;
+  capacity: number;
+}
+
+export interface VisualizationAction {
+  way: VisualizationEdge[];
+  flow: number;
+}
+
+export interface Visualization {
+  visualization: VisualizationAction[];
+  flow: number;
+}

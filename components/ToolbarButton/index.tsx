@@ -5,12 +5,13 @@ import { FC, ReactNode, Key } from "react";
 
 interface Props {
   children: ReactNode;
-  key: Key;
+  disabled?: boolean;
+  key?: Key;
   mode?: MODES;
   onClick?: () => void;
 }
 
-export const ToolbarButton: FC<Props> = ({ children, mode }) => {
+export const ToolbarButton: FC<Props> = ({ children, mode, disabled }) => {
   const graphMode = useAppSelector(graphModeSelector);
 
   const dispatch = useAppDispatch();
@@ -26,8 +27,9 @@ export const ToolbarButton: FC<Props> = ({ children, mode }) => {
         graphMode === mode ? "bg-gray-200" : "bg-white"
       } p-3 border-solid ${
         graphMode === mode ? "border-1" : "border-hidden"
-      } rounded-full pointer-events-auto hover:shadow-md cursor-pointer active:opacity-68`}
+      } rounded-full pointer-events-auto hover:shadow-md cursor-pointer active:opacity-68 disabled:opacity-30`}
       onClick={handleClick}
+      disabled={disabled}
     >
       {children}
     </button>
