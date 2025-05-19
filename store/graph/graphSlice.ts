@@ -117,6 +117,12 @@ export const graphSlice = createSlice({
       state.nodes[updatedNodeIndex].actualX = x;
       state.nodes[updatedNodeIndex].actualY = y;
     },
+    actualizeNodesPositions: (state) => {
+      for (let index = 0; index < state.nodes.length; index += 1) {
+        state.nodes[index].x = state.nodes[index].actualX;
+        state.nodes[index].y = state.nodes[index].actualY;
+      }
+    },
     addNewEdgeNode: (state, { payload }: PayloadAction<number>) => {
       state.newEdgeNodes.push(payload);
     },
@@ -134,6 +140,7 @@ export const {
   setMode,
   addNode,
   removeNode,
+  actualizeNodesPositions,
   updateNodePosition,
   addNewEdgeNode,
   clearNewEdgeNodes,
