@@ -14,3 +14,8 @@ export const visualizationSelector = createSelector(
   [visualizationReducerSelector],
   ({ visualization }) => visualization
 );
+
+export const frameActionIndexSelector = createSelector(
+  [visualizationReducerSelector],
+  ({ frameActionIndex }) => frameActionIndex
+);

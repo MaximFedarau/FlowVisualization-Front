@@ -1,7 +1,12 @@
 import { GraphEdge, GraphNode, Visualization } from "@/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-import { setVisualization, setMode } from "@/store/visualization";
+import {
+  setVisualization,
+  setMode,
+  setFrameActionIndex,
+} from "@/store/visualization";
+import { actualizeNodesPositions } from "../graph";
 
 const formatEdges = (edges: GraphEdge[]) => {
   const old_indexes: number[] = [];
@@ -41,7 +46,7 @@ export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: `${process.env.BACKEND_URL}/` }),
   endpoints: (builder) => ({
     getVisualization: builder.query<
-      undefined,
+      Visualization,
       { algorithm: string; nodes: GraphNode[]; edges: GraphEdge[] }
     >({
       async queryFn(
@@ -79,9 +84,11 @@ export const api = createApi({
         );
 
         dispatch(setVisualization(visualizationResponse.data as Visualization));
+        dispatch(setFrameActionIndex(0));
+        dispatch(actualizeNodesPositions());
         dispatch(setMode(true));
         return {
-          data: undefined,
+          data: visualization,
         };
       },
     }),

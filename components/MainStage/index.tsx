@@ -13,7 +13,7 @@ import { MODES } from "@/types";
 import { Stage } from "react-konva";
 import { Grid } from "@/components/Grid";
 import { KonvaEventObject } from "konva/lib/Node";
-import { MainScene } from "../MainScene";
+import { MainScene } from "@/components/MainScene";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import {
   addEdge,
@@ -25,6 +25,8 @@ import {
 } from "@/store/graph";
 import { createPortal } from "react-dom";
 import { Dialog } from "@/components/Dialog";
+import { isAnimationModeEnabledSelector } from "@/store/visualization";
+import { VisualizationScene } from "@/components/VisualizationScene";
 
 export const MainStage: FC = () => {
   const [isOpenDialog, setIsOpenDialog] = useState(false);
@@ -123,6 +125,8 @@ export const MainStage: FC = () => {
     closeDialog();
   };
 
+  const isAnimationModeEnabled = useAppSelector(isAnimationModeEnabledSelector);
+
   return (
     <div ref={containerRef} className="w-full h-full">
       <Stage
@@ -131,7 +135,11 @@ export const MainStage: FC = () => {
         onClick={handleClick}
       >
         <Grid />
-        <MainScene openNewEdgeDialog={openDialog} {...stageSize} />
+        {!isAnimationModeEnabled ? (
+          <MainScene openNewEdgeDialog={openDialog} {...stageSize} />
+        ) : (
+          <VisualizationScene />
+        )}
       </Stage>
       {isOpenDialog &&
         createPortal(
