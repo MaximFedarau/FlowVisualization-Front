@@ -35,7 +35,7 @@ export const VisualizationScene: FC = () => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (frameActionIndex + 1 === visualization.visualization.length) {
+      if (frameActionIndex + 1 >= visualization.visualization.length) {
         clearInterval(intervalId);
       } else {
         dispatch(setFrameActionIndex(frameActionIndex + 1));

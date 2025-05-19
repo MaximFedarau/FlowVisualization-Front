@@ -1,6 +1,12 @@
 import { FC, useState } from "react";
 import { ToolbarButton } from "@/components/ToolbarButton";
-import { FaRegCircle, FaRandom, FaPlay } from "react-icons/fa";
+import {
+  FaRegCircle,
+  FaRandom,
+  FaPlay,
+  FaBackward,
+  FaForward,
+} from "react-icons/fa";
 import { FaArrowPointer, FaDownload } from "react-icons/fa6";
 import { SlGraph } from "react-icons/sl";
 import { IoMdClose } from "react-icons/io";
@@ -8,10 +14,12 @@ import { MODES } from "@/types";
 import { useLazyGetVisualizationQuery } from "@/store/api";
 import { useAppDispatch, useAppSelector } from "@/hooks";
 import {
+  frameActionIndexSelector,
   isAnimationModeEnabledSelector,
   setFrameActionIndex,
   setMode,
   setVisualization,
+  visualizationSelector,
 } from "@/store/visualization";
 import {
   actualizeNodesPositions,
@@ -31,8 +39,7 @@ export const Toolbar: FC = () => {
   const isAnimationModeEnabled = useAppSelector(isAnimationModeEnabledSelector);
   const graphNodes = useAppSelector(graphNodesSelector);
   const graphEdges = useAppSelector(graphEdgesSelector);
-  const [getVisualization, { isLoading, isSuccess }] =
-    useLazyGetVisualizationQuery();
+  const [getVisualization, { isLoading }] = useLazyGetVisualizationQuery();
 
   const dispatch = useAppDispatch();
 
@@ -55,6 +62,18 @@ export const Toolbar: FC = () => {
     dispatch(setMode(false));
     dispatch(setVisualization({ flow: 0, visualization: [] }));
   };
+
+  const frameAnimationIndex = useAppSelector(frameActionIndexSelector);
+  const visualization = useAppSelector(visualizationSelector);
+
+  const handleBackwardAnimation = () =>
+    dispatch(setFrameActionIndex(Math.max(frameAnimationIndex - 1, 0)));
+  const handleForwardAnimation = () =>
+    dispatch(
+      setFrameActionIndex(
+        Math.min(frameAnimationIndex + 1, visualization.visualization.length)
+      )
+    );
 
   return (
     <>
@@ -81,6 +100,28 @@ export const Toolbar: FC = () => {
             <option value="edmonds-karp">Edmonds-Karp Algorithm</option>
             <option value="dinic">Dinic&apos;s Algorithm</option>
           </select>
+        )}
+        {isAnimationModeEnabled && (
+          <>
+            <ToolbarButton>
+              <FaBackward onClick={handleBackwardAnimation} />
+            </ToolbarButton>
+            <div className="h-10 w-[50%] bg-gray-200">
+              <div
+                className="h-full  bg-green-300 rounded-lg"
+                style={{
+                  width: `${
+                    ((frameAnimationIndex + 1) /
+                      visualization.visualization.length) *
+                    100
+                  }%`,
+                }}
+              ></div>
+            </div>
+            <ToolbarButton>
+              <FaForward onClick={handleForwardAnimation} />
+            </ToolbarButton>
+          </>
         )}
         {isAnimationModeEnabled && (
           <ToolbarButton disabled={isLoading}>
