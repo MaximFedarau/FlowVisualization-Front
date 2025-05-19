@@ -11,12 +11,21 @@ interface Props {
   onClick?: () => void;
 }
 
-export const ToolbarButton: FC<Props> = ({ children, mode, disabled }) => {
+export const ToolbarButton: FC<Props> = ({
+  children,
+  mode,
+  disabled,
+  onClick,
+}) => {
   const graphMode = useAppSelector(graphModeSelector);
 
   const dispatch = useAppDispatch();
 
   const handleClick = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
     dispatch(clearNewEdgeNodes());
     dispatch(setMode(mode || MODES.DEFAULT));
   };

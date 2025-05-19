@@ -60,6 +60,34 @@ export const MainScene: FC<Props> = ({
     }
   };
 
+  const handleTap = (event: KonvaEventObject<Event>, id: number) => {
+    event.cancelBubble = true;
+
+    if (graphMode === MODES.EDGE) {
+      const selectedNode = graphNodes.find((node) => node.id === id);
+
+      if (selectedNode && selectedNode.is_sink && newEdgeNodes.length === 0) {
+        return;
+      }
+
+      if (selectedNode && selectedNode.is_source && newEdgeNodes.length === 1) {
+        return;
+      }
+
+      dispatch(addNewEdgeNode(id));
+      if (newEdgeNodes.length == 1) {
+        openNewEdgeDialog();
+        return;
+      }
+    }
+  };
+
+  const handleDoubleTap = (id: number) => {
+    if (graphMode === MODES.DEFAULT) {
+      dispatch(removeNode(id));
+    }
+  };
+
   const handleNodeDrag = (x: number, y: number, id: number) => {
     dispatch(updateNodePosition({ x, y, id }));
   };
@@ -81,6 +109,8 @@ export const MainScene: FC<Props> = ({
               onDragMove={(event) =>
                 handleNodeDrag(event.target.x(), event.target.y(), node.id)
               }
+              onTap={(event) => handleTap(event, node.id)}
+              onDblTap={() => handleDoubleTap(node.id)}
             />
             {newEdgeNodes.indexOf(node.id) != -1 && (
               <Text

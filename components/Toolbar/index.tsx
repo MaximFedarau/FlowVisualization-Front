@@ -84,10 +84,10 @@ export const Toolbar: FC = () => {
           ))}
         </div>
       )}
-      <div className="flex gap-4 absolute bottom-0 items-center justify-center py-8 z-100 w-screen">
+      <div className="flex gap-4 absolute bottom-0 items-center justify-center py-8 z-1 w-screen">
         {!isAnimationModeEnabled && (
-          <ToolbarButton disabled={isLoading}>
-            <FaPlay onClick={startVisualization} />
+          <ToolbarButton disabled={isLoading} onClick={startVisualization}>
+            <FaPlay />
           </ToolbarButton>
         )}
         {!isAnimationModeEnabled && !isLoading && (
@@ -103,8 +103,8 @@ export const Toolbar: FC = () => {
         )}
         {isAnimationModeEnabled && (
           <>
-            <ToolbarButton>
-              <FaBackward onClick={handleBackwardAnimation} />
+            <ToolbarButton onClick={handleBackwardAnimation}>
+              <FaBackward />
             </ToolbarButton>
             <div className="h-10 w-[50%] bg-gray-200">
               <div
@@ -118,14 +118,14 @@ export const Toolbar: FC = () => {
                 }}
               ></div>
             </div>
-            <ToolbarButton>
-              <FaForward onClick={handleForwardAnimation} />
+            <ToolbarButton onClick={handleForwardAnimation}>
+              <FaForward />
             </ToolbarButton>
           </>
         )}
         {isAnimationModeEnabled && (
-          <ToolbarButton disabled={isLoading}>
-            <IoMdClose onClick={leaveAnimationMode} />
+          <ToolbarButton disabled={isLoading} onClick={leaveAnimationMode}>
+            <IoMdClose />
           </ToolbarButton>
         )}
       </div>
